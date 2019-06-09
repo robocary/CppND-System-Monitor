@@ -1,3 +1,6 @@
+#ifndef PROCESS_H
+#define PROCESS_H
+
 #include <string>
 
 using namespace std;
@@ -23,6 +26,10 @@ public:
         //complete for cmd
         //complete for upTime
         //complete for cpu
+        this->mem = ProcessParser::getVmSize(pid);
+        this->cmd = ProcessParser::getCmd(pid);
+        this->up_time = ProcessParser::getProcUpTime(pid);
+        this->cpu  = ProcessParser::getCpuPercent(pid);
     }
     void setPid(int pid);
     string getPid()const;
@@ -46,5 +53,17 @@ string Process::getProcess(){
     this->upTime = ProcessParser::getProcUpTime(this->pid);
     this->cpu = ProcessParser::getCpuPercent(this->pid);
 
-    return (this->pid + "   " + //TODO: finish the string! this->user + "   "+ mem...cpu...upTime...;
+    return (this->pid + "   "  //TODO: finish the string! this->user + "   "+ mem...cpu...upTime...;
+            + this->user
+            + "   "
+            + this->mem.substr(0,5)
+            + "     "
+            + this->cpu.substr(0,5)
+            + "     "
+            + this->up_time.substr(0,5)
+            + "    "
+            + this->cmd.substr(0,30)
+            + "...");
 }
+
+#endif
