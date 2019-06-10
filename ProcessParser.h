@@ -43,9 +43,12 @@ private:
     static int getTotalThreads();
     static int getTotalNumberOfProcesses();
     static int getNumberOfRunningProcesses();
-    static string getOSName();
-    static std::string PrintCpuStats(std::vector<std::string> values1, std::vector<std::string>values2);
+    static string getOsName();
+    static std::string printCpuStats(std::vector<std::string> values1, std::vector<std::string>values2);
     static bool isPidExisting(string pid);
+    static float getSysActiveCpuTime(std::vector<string> values);
+    static float getSysIdleCpuTime(std::vector<string> values);
+    static int getNumberOfCores();
 };
 
 // TODO: Define all of the above functions below:
@@ -283,6 +286,7 @@ int ProcessParser::getTotalThreads()
     }
     return result;
 }
+}
 
 int ProcessParser::getTotalNumberOfProcesses()
 {
@@ -340,6 +344,23 @@ string ProcessParser::getOsName()
 
 }
 
+float ProcessParser::getSysActiveCpuTime(std::vector<string> values)
+{
+    return (stof(values[S_USER]) +
+            stof(values[S_NICE]) +
+            stof(values[S_SYSTEM]) +
+            stof(values[S_IRQ]) +
+            stof(values[S_SOFTIRQ]) +
+            stof(values[S_STEAL]) +
+            stof(values[S_GUEST]) +
+            stof(values[S_GUEST_NICE]));
+}
+
+float ProcessParser::getSysIdleCpuTime(std::vector<string> values)
+{
+    return (stof(values[S_IDLE]) + stof(values[S_IOWAIT]));
+}
+
 string ProcessParser::printCpuStats(vector<string> values1, vector<string> values2)
 {
 /*
@@ -356,14 +377,32 @@ We use a formula to calculate overall activity of processor.
   
 bool ProcessParser::isPidExisting(string pid)
 {
-     container = getPidList();
-     if(std::find(container.begin(), container.end(), pid){
+     auto container = getPidList();
+     auto iter = std::find(container.begin(), container.end(), pid);
+     if(iter != container.end()){
        return true;
      }
      else{
        return false;
      }
    
+}
+
+int ProcessParser::getNumberOfCores()
+{
+    // Get the number of host cpu cores
+    string line;
+    string name = "cpu cores";
+    ifstream stream = Util::getStream((Path::basePath() + "cpuinfo"));
+    while (std::getline(stream, line)) {
+        if (line.compare(0, name.size(),name) == 0) {
+            istringstream buf(line);
+            istream_iterator<string> beg(buf), end;
+            vector<string> values(beg, end);
+            return stoi(values[3]);
+        }
+    }
+    return 0;
 }
 
 #endif

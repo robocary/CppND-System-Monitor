@@ -28,7 +28,7 @@ public:
         //complete for cpu
         this->mem = ProcessParser::getVmSize(pid);
         this->cmd = ProcessParser::getCmd(pid);
-        this->up_time = ProcessParser::getProcUpTime(pid);
+        this->upTime = ProcessParser::getProcUpTime(pid);
         this->cpu  = ProcessParser::getCpuPercent(pid);
     }
     void setPid(int pid);
@@ -60,7 +60,7 @@ string Process::getProcess(){
             + "     "
             + this->cpu.substr(0,5)
             + "     "
-            + this->up_time.substr(0,5)
+            + this->upTime.substr(0,5)
             + "    "
             + this->cmd.substr(0,30)
             + "...");
